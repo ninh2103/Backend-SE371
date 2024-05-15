@@ -53,7 +53,7 @@ userRouter.post(
 )
 userRouter.post('/reset-password', resetPasswordValidator, wrapRequestHandler(resetPasswordController))
 userRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController))
-userRouter.get('/profile/:username', accessTokenValidator, wrapRequestHandler(getProfileController))
+userRouter.get('/profile/:username', wrapRequestHandler(getProfileController))
 
 userRouter.patch(
   '/update-me',

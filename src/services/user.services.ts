@@ -10,6 +10,7 @@ import { config } from 'dotenv'
 import { USERMESSAGE } from '~/constants/messages'
 import Friend from '~/models/schemas/Friend.chema'
 import { verify } from 'crypto'
+import { sendEmail } from '~/utils/email'
 config()
 class UsersService {
   private decodedRefreshToken(refresh_token: string) {
@@ -99,7 +100,8 @@ class UsersService {
         email_verify_token,
         username: username,
         date_of_birth: new Date(payload.date_of_birth),
-        password: hashPassword(payload.password)
+        password: hashPassword(payload.password),
+        role: payload.role
       })
     )
     const [access_token, refresh_token] = await this.signAccessandRefreshToken({
@@ -110,7 +112,7 @@ class UsersService {
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token, iat, exp })
     )
-    console.log('email verify token :', email_verify_token)
+    await sendEmail(payload.email, payload.name, email_verify_token, 'verify')
     return {
       access_token,
       refresh_token
@@ -199,9 +201,9 @@ class UsersService {
       refresh_token
     }
   }
-  async resendVerifyEmail(user_id: string) {
+  async resendVerifyEmail(user_id: string, name: string, email: string) {
     const email_verify_token = await this.signVerifyEmailToken({ user_id, verify: UserVerifyStatus.Unverified })
-    console.log('resend Verify Email: ', email_verify_token)
+    await sendEmail(email, name, email_verify_token, 'verify')
 
     await databaseService.users.updateOne(
       { _id: new ObjectId(user_id) },
@@ -218,7 +220,17 @@ class UsersService {
       message: USERMESSAGE.RESEND_EMAIL_VERIFY_SUCCESS
     }
   }
-  async forgotPassword({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+  async forgotPassword({
+    user_id,
+    verify,
+    email,
+    name
+  }: {
+    user_id: string
+    verify: UserVerifyStatus
+    email: string
+    name: string
+  }) {
     const forgot_password_token = await this.signForgotPasswordToken({ user_id, verify })
     await databaseService.users.updateOne(
       { _id: new ObjectId(user_id) },
@@ -231,6 +243,8 @@ class UsersService {
         }
       }
     )
+    await sendEmail(email, name, forgot_password_token, 'forgotPassword')
+
     console.log('Forgot Password Token: ', forgot_password_token)
     return {
       message: USERMESSAGE.CHECK_EMAIL_TO_RESET_PASSWORD
@@ -257,7 +271,8 @@ class UsersService {
         projection: {
           password: 0,
           forgot_password_token: 0,
-          email_verify_token: 0
+          email_verify_token: 0,
+          role: 0
         }
       }
     )
@@ -275,7 +290,8 @@ class UsersService {
           verify: 0,
           create_at: 0,
           update_at: 0,
-          permisson_id: 0
+          permisson_id: 0,
+          role: 0
         }
       }
     )

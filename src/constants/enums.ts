@@ -3,6 +3,10 @@ export enum UserVerifyStatus {
   Verified,
   Banned
 }
+export enum RoleType {
+  User,
+  Admin
+}
 export enum Tokentype {
   AccessToken,
   RefreshToken,
@@ -11,8 +15,7 @@ export enum Tokentype {
 }
 export enum StatusFriend {
   Pending,
-  Accepted,
-  Rejected
+  Accepted
 }
 export enum MediaType {
   Image,

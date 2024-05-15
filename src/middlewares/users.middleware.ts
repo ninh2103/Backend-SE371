@@ -14,6 +14,7 @@ import { config } from 'dotenv'
 import { TokenPayload } from '~/models/requests/User.requests'
 import { UserVerifyStatus } from '~/constants/enums'
 import { REGEX_USER } from '~/constants/regex'
+import { isInteger } from 'lodash'
 config()
 const passwordSchema: ParamSchema = {
   notEmpty: {
@@ -235,6 +236,14 @@ export const registerValidator = validate(
             strictSeparator: true
           },
           errorMessage: USERMESSAGE.DATE_OF_BIRTH_MUST_BE_ISO8601
+        }
+      },
+      role: {
+        notEmpty: {
+          errorMessage: USERMESSAGE.ROLE_IS_REQUIRED
+        },
+        isNumeric: {
+          errorMessage: USERMESSAGE.ROLE_IS_INT
         }
       }
     },

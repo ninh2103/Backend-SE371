@@ -1,5 +1,5 @@
 import { JwtPayload } from 'jsonwebtoken'
-import { Tokentype, UserVerifyStatus } from '~/constants/enums'
+import { RoleType, Tokentype, UserVerifyStatus } from '~/constants/enums'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 export interface LoginReqBody {
@@ -23,6 +23,7 @@ export interface RegisterReqBody {
   comfirm_password: string
   date_of_birth: string
   username: string
+  role: RoleType
 }
 export interface LogoutReqBody {
   refresh_token: string

@@ -60,7 +60,9 @@ export const USERMESSAGE = {
   NOT_SEND_FRIEND_REQUEST: 'chưa gửi lời mời kết bạn',
   REFUSE_THE_FRIEND_REQUEST_SUCCESS: 'từ chối lời kết bạn thành công',
   USER_NOT_AUTHOR_OR_COMMENT: 'không phải tác giả của bài post hoặc là tác giả của comment',
-  USER_NOT_AUTHOR: 'Không phải là tác giả'
+  USER_NOT_AUTHOR: 'Không phải là tác giả',
+  ROLE_IS_REQUIRED: ' role không được để trống',
+  ROLE_IS_INT: 'role phải là kiểu số 0 or 1'
 } as const
 
 export const POSTMESSAGE = {
