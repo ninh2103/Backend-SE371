@@ -640,16 +640,16 @@ export const getConversationsValidator = validate(
     ['params']
   )
 )
-export const checkAdmin = wrapRequestHandler(async (req: Request, res: Response, next: NextFunction) => {
-  const users = req.user as User
-  if (users && users.role === 1) {
-    if (!req.decoded_authorization) {
-      next()
-    } else {
-      throw new ErrorWithStatus({
-        status: HTTP_STATUS.UNAUTHORIZED,
-        message: USERMESSAGE.YOU_NOT_ADMIN
-      })
-    }
-  }
-})
+// export const checkAdmin = wrapRequestHandler(async (req: Request, res: Response, next: NextFunction) => {
+//   const users = req.user as User
+//   if (users && users.role === 1) {
+//     if (!req.decoded_authorization) {
+//       next()
+//     } else {
+//       throw new ErrorWithStatus({
+//         status: HTTP_STATUS.UNAUTHORIZED,
+//         message: USERMESSAGE.YOU_NOT_ADMIN
+//       })
+//     }
+//   }
+// })

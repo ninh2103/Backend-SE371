@@ -245,8 +245,9 @@ export const serveVideoStreamController = async (req: Request, res: Response, ne
   const videoStream = fs.createReadStream(videoPath, { start, end })
   videoStream.pipe(res)
 }
-export const delAllUserController = async (req: Request, res: Response, next: NextFunction) => {
-  await databaseService.users.deleteMany({})
+export const delUserController = async (req: Request, res: Response, next: NextFunction) => {
+  const user_id = req.decoded_authorization as TokenPayload
+  await databaseService.users.deleteOne({ user_id })
   return res.json({
     message: USERMESSAGE.DELETE_USER_SUCCESS
   })
