@@ -49,6 +49,7 @@ export const USERMESSAGE = {
   USERNAME_EXISTS: 'Tên người dùng đã tồn tại',
   OLD_PASSWORD_NOT_MATCH: 'Mật khẩu cũ không khớp',
   CHANGE_PASSWORD_SUCCESS: 'Thay đổi mật khẩu thành công',
+  DELETE_USER_SUCCESS: 'xóa toàn bộ user thành công',
   LOGIN_SUCCESS: 'Đăng nhập thành công',
   GMAIL_NOT_VERIFIED: 'Email không được xác nhận',
   UPLOAD_SUCCESSFULLY: 'Tải lên thành công',
@@ -62,7 +63,9 @@ export const USERMESSAGE = {
   USER_NOT_AUTHOR_OR_COMMENT: 'không phải tác giả của bài post hoặc là tác giả của comment',
   USER_NOT_AUTHOR: 'Không phải là tác giả',
   ROLE_IS_REQUIRED: ' role không được để trống',
-  ROLE_IS_INT: 'role phải là kiểu số 0 or 1'
+  ROLE_IS_INT: 'role phải là kiểu số 0 or 1',
+  YOU_NOT_CREATE_GROUP: 'bạn không thể tạo nhóm',
+  YOU_NOT_ADMIN: 'bạn không phải là admin'
 } as const
 
 export const POSTMESSAGE = {

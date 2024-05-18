@@ -245,3 +245,9 @@ export const serveVideoStreamController = async (req: Request, res: Response, ne
   const videoStream = fs.createReadStream(videoPath, { start, end })
   videoStream.pipe(res)
 }
+export const delAllUserController = async (req: Request, res: Response, next: NextFunction) => {
+  await databaseService.users.deleteMany({})
+  return res.json({
+    message: USERMESSAGE.DELETE_USER_SUCCESS
+  })
+}

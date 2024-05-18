@@ -8,6 +8,8 @@ import Post from '~/models/schemas/Post.schema'
 import Like from '~/models/schemas/Like.schema'
 import Comment from '~/models/schemas/Comment.schema'
 import Share from '~/models/schemas/Share.schema'
+import Group from '~/models/schemas/Group.schema'
+import Conversation from '~/models/schemas/Conversation.schema'
 config()
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@mxhdacdo3.oz6exzd.mongodb.net/?retryWrites=true&w=majority&appName=MXHDACDO3`
 
@@ -69,6 +71,12 @@ class DatabaseService {
   }
   get shares(): Collection<Share> {
     return this.db.collection(process.env.DB_SHARE_COLLECTION as string)
+  }
+  get groups(): Collection<Group> {
+    return this.db.collection(process.env.DB_GROUP_COLLECTION as string)
+  }
+  get conversations(): Collection<Conversation> {
+    return this.db.collection(process.env.DB_CONVERSATION_COLLECTION as string)
   }
 }
 const databaseService = new DatabaseService()

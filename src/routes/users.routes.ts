@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
   acceptFriendRequestController,
   changepasswordController,
+  delAllUserController,
   deleteFriendRequestController,
   emailVerifyController,
   forgotPasswordController,
@@ -23,6 +24,7 @@ import {
   acceptValidator,
   accessTokenValidator,
   changePasswordValidator,
+  checkAdmin,
   emailVerifyTokenValidator,
   forgotPasswordValidator,
   friendValidator,
@@ -105,5 +107,12 @@ userRouter.put(
   accessTokenValidator,
   changePasswordValidator,
   wrapRequestHandler(changepasswordController)
+)
+userRouter.delete(
+  '/admin/delete-all-users',
+  accessTokenValidator,
+  verifiedUserValidator,
+  checkAdmin,
+  wrapRequestHandler(delAllUserController)
 )
 export default userRouter

@@ -112,12 +112,14 @@ class UsersService {
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token, iat, exp })
     )
+    console.log('email_verify_token', email_verify_token)
     await sendEmail(payload.email, payload.name, email_verify_token, 'verify')
     return {
       access_token,
       refresh_token
     }
   }
+
   async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
     const [access_token, refresh_token] = await this.signAccessandRefreshToken({
       user_id,
@@ -271,8 +273,7 @@ class UsersService {
         projection: {
           password: 0,
           forgot_password_token: 0,
-          email_verify_token: 0,
-          role: 0
+          email_verify_token: 0
         }
       }
     )

@@ -7,6 +7,10 @@ export enum RoleType {
   User,
   Admin
 }
+export enum ConversationStatus {
+  Private,
+  Group
+}
 export enum Tokentype {
   AccessToken,
   RefreshToken,

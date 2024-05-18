@@ -15,6 +15,8 @@ import { TokenPayload } from '~/models/requests/User.requests'
 import { UserVerifyStatus } from '~/constants/enums'
 import { REGEX_USER } from '~/constants/regex'
 import { isInteger } from 'lodash'
+import User from '~/models/schemas/User.schema'
+import { wrapRequestHandler } from '~/utils/handlers'
 config()
 const passwordSchema: ParamSchema = {
   notEmpty: {
@@ -630,3 +632,24 @@ export const changePasswordValidator = validate(
     ['body']
   )
 )
+export const getConversationsValidator = validate(
+  checkSchema(
+    {
+      receiver_id: userIdSchema
+    },
+    ['params']
+  )
+)
+export const checkAdmin = wrapRequestHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const users = req.user as User
+  if (users && users.role === 1) {
+    if (!req.decoded_authorization) {
+      next()
+    } else {
+      throw new ErrorWithStatus({
+        status: HTTP_STATUS.UNAUTHORIZED,
+        message: USERMESSAGE.YOU_NOT_ADMIN
+      })
+    }
+  }
+})

@@ -13,6 +13,11 @@ import { commentRouter } from './routes/comments.routes'
 import { sharesRouter } from './routes/shares.routes'
 import { createServer } from 'http'
 import { Server, Socket } from 'socket.io'
+import { groupRouter } from './routes/group.routes'
+import { conversationsRouter } from './routes/conversations.routes'
+import Conversation from './models/schemas/Conversation.schema'
+import { ConversationStatus } from './constants/enums'
+import { ObjectId } from 'mongodb'
 
 const app = express()
 const httpServer = createServer(app)
@@ -34,6 +39,8 @@ app.use('/posts', postsRouter)
 app.use('/likes', likesRouter)
 app.use('/comments', commentRouter)
 app.use('/shares', sharesRouter)
+app.use('/groups', groupRouter)
+app.use('/conversations', conversationsRouter)
 
 // app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
 
@@ -43,39 +50,44 @@ databaseService.indexRefreshToken()
 databaseService.indexFriends()
 app.use(defaultErrorHanddler)
 
-// const users: {
-//   [key: string]: {
-//     socket_id: string
-//   }
-// } = {}
-// io.on('connection', (socket: Socket) => {
-//   console.log(`user ${socket.id} connect`)
-//   const user_id = socket.handshake.auth._id
-//   console.log('user_id', user_id)
-//   users[user_id] = {
-//     socket_id: socket.id
-//   }
-//   console.log(users)
+const users: {
+  [key: string]: {
+    socket_id: string
+  }
+} = {}
+io.on('connection', (socket: Socket) => {
+  console.log(`user ${socket.id} connect`)
+  const user_id = socket.handshake.auth._id
+  console.log('user_id', user_id)
+  users[user_id] = {
+    socket_id: socket.id
+  }
+  console.log(users)
 
-//   socket.on('private_message', (data) => {
-//     const socket_reciver_id = users[data.to]?.socket_id
-//     if (!socket_reciver_id) {
-//       return
-//     }
-//     socket.to(socket_reciver_id).emit('reciver_message', {
-//       content: data.content,
-//       from: user_id
-//     })
-//   })
-//   socket.on('disconnect', () => {
-//     delete users[user_id]
-//     console.log(`user ${socket.id} disconnect`)
-//     console.log(users)
-//   })
-// })
-// httpServer.listen(port, () => {
-//   console.log(`Dang Chay tren Port ${port}`)
-// })
+  socket.on('private_message', async (data) => {
+    const socket_reciver_id = users[data.to]?.socket_id
+    if (!socket_reciver_id) {
+      return
+    }
+    await databaseService.conversations.insertOne(
+      new Conversation({
+        sender_id: new ObjectId(data.from),
+        receiver_id: new ObjectId(data.to),
+        content: data.content,
+        conversation_Type: ConversationStatus.Private
+      })
+    )
+    socket.to(socket_reciver_id).emit('reciver_message', {
+      content: data.content,
+      from: user_id
+    })
+  })
+  socket.on('disconnect', () => {
+    delete users[user_id]
+    console.log(`user ${socket.id} disconnect`)
+    console.log(users)
+  })
+})
 httpServer.listen(port, () => {
   console.log(`Dang Chay tren Port ${port}`)
 })
