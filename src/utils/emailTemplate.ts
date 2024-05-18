@@ -1,15 +1,17 @@
-// emailTemplate.ts
 export const getHtmlTemplate = (username: string, link: string, emailType: 'verify' | 'forgotPassword'): string => {
   let message
   let buttonLabel
+  let fullLink
 
   if (emailType === 'verify') {
     message =
       'Thank you for registering with us. To complete your registration, please verify your email address by clicking the button below:'
     buttonLabel = 'Verify Email'
+    fullLink = `http://localhost:5173/verify-email?token=${link}`
   } else if (emailType === 'forgotPassword') {
     message = 'We received a request to reset your password. You can reset your password by clicking the button below:'
     buttonLabel = 'Reset Password'
+    fullLink = `http://localhost:5173/forgot-password?token=${link}`
   }
 
   return `
@@ -78,7 +80,7 @@ export const getHtmlTemplate = (username: string, link: string, emailType: 'veri
             <div class="email-body">
                 <h2>Hello, ${username}!</h2>
                 <p>${message}</p>
-                <a href="${link}" class="action-button">${buttonLabel}</a>
+                <a href="${fullLink}" class="action-button">${buttonLabel}</a>
                 <p>If you did not request this, please ignore this email.</p>
                 <p>Thank you,<br>The Team</p>
             </div>
