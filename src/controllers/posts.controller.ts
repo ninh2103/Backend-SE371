@@ -30,11 +30,9 @@ export const getPostController = async (req: Request, res: Response, next: NextF
   })
 }
 export const getNewFeedsController = async (req: Request, res: Response, next: NextFunction) => {
-  const limit = Number(req.query.limit as string)
-  const page = Number(req.query.page as string)
   const { user_id } = req.decoded_authorization as TokenPayload
 
-  const result = await postsService.getNewFeeds({ user_id, limit, page })
+  const result = await postsService.getNewFeeds({ user_id })
   return res.json({
     message: 'get new feed Successfully',
     result: result

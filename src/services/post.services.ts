@@ -42,9 +42,9 @@ class PostsService {
       updated_at: Date
     }>
   }
-  async getNewFeeds({ user_id, limit, page }: { user_id: string; limit: number; page: number }) {
+  async getNewFeeds({ user_id }: { user_id: string }) {
     const user_id_obj = new ObjectId(user_id)
-    const friend = await databaseService.friends
+    const friends = await databaseService.friends
       .find(
         {
           user_id: user_id_obj
@@ -57,9 +57,10 @@ class PostsService {
         }
       )
       .toArray()
-    const ids = friend.map((item) => item.friend_user_id)
+    const ids = friends.map((item) => item.friend_user_id)
     ids.push(user_id_obj)
-    const post = await databaseService.posts
+
+    const posts = await databaseService.posts
       .aggregate([
         {
           $match: {
@@ -89,31 +90,26 @@ class PostsService {
             as: 'friend'
           }
         },
-        {
-          $match: {
-            $or: [
-              {
-                visibility: VisibilityType.EveryOne
-              },
-              {
-                $and: [
-                  {
-                    visibility: VisibilityType.Friends
-                  },
-                  {
-                    'user.status': 1
-                  }
-                ]
-              }
-            ]
-          }
-        },
-        {
-          $skip: limit * (page - 1)
-        },
-        {
-          $limit: limit
-        },
+        // {
+        //   $match: {
+        //     $or: [
+        //       {
+        //         visibility: VisibilityType.EveryOne
+        //       },
+        //       {
+        //         $and: [
+        //           {
+        //             visibility: VisibilityType.Friends
+        //           },
+        //           {
+        //             'user.verify': 1
+        //           }
+        //         ]
+        //       }
+        //     ]
+        //   }
+        // },
+        // Đã loại bỏ $skip và $limit
         {
           $lookup: {
             from: 'users',
@@ -183,13 +179,15 @@ class PostsService {
               email_verify_token: 0,
               forgot_password_token: 0,
               permisson_id: 0,
-              date_of_birth: 0
+              date_of_birth: 0,
+              role: 0
             }
           }
         }
       ])
       .toArray()
-    return post
+
+    return posts
   }
 }
 const postsService = new PostsService()

@@ -25,10 +25,4 @@ postsRouter.get(
   visibilityValidator,
   wrapRequestHandler(getPostController)
 )
-postsRouter.get(
-  '/',
-  accessTokenValidator,
-  verifiedUserValidator,
-  paginateValidator,
-  wrapRequestHandler(getNewFeedsController)
-)
+postsRouter.get('/', accessTokenValidator, verifiedUserValidator, wrapRequestHandler(getNewFeedsController))
