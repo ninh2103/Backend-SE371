@@ -18,7 +18,7 @@ class MediasService {
         fs.unlinkSync(file.filepath)
         return {
           url: isProduction
-            ? `$https://my-twitter-clone.com/medias/${newName}.jpg`
+            ? `$https://my-we-clone.com/medias/${newName}.jpg`
             : `http://localhost:4000/medias/${newName}.jpg`,
           type: MediaType.Image
         }
@@ -31,7 +31,7 @@ class MediasService {
     const { newFilename } = files[0]
     return {
       url: isProduction
-        ? `$https://my-twitter-clone.com/static/video/${newFilename}`
+        ? `$https://my-we-clone.com/static/video/${newFilename}`
         : `http://localhost:4000/static/video/${newFilename}`,
       type: MediaType.video
     }

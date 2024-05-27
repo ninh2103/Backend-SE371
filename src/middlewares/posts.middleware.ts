@@ -135,7 +135,6 @@ export const postIdValidator = validate(
                 }
               ])
               .toArray()
-            console.log(post)
             if (!post) {
               throw new ErrorWithStatus({
                 status: HTTP_STATUS.NOT_FOUND,

@@ -18,7 +18,7 @@ export const likesPostController = async (
 }
 export const unLikesPostController = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  await likesService.unLikePost(user_id, req.params.tweet_id)
+  await likesService.unLikePost(user_id, req.params.post_id)
   return res.json({
     message: ' Unlike Post Successfully'
   })
