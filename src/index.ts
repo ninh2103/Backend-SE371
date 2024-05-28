@@ -27,8 +27,8 @@ const io = new Server(httpServer, {
     origin: '*'
   }
 })
-app.use(express.json({ limit: '50mb' })) // Tăng giới hạn kích thước payload cho JSON
-app.use(express.urlencoded({ limit: '50mb', extended: true }))
+// app.use(express.json({ limit: '50mb' })) // Tăng giới hạn kích thước payload cho JSON
+// app.use(express.urlencoded({ limit: '50mb', extended: true }))
 const port = 4000
 initFoder()
 app.use(express.json())

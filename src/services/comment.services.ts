@@ -27,6 +27,25 @@ class CommentServices {
           }
         },
         {
+          $lookup: {
+            from: 'users',
+            localField: 'user_id',
+            foreignField: '_id',
+            as: 'user'
+          }
+        },
+        {
+          $project: {
+            user: {
+              password: 0,
+              email_verify_token: 0,
+              forgot_password_token: 0,
+              permisson_id: 0,
+              date_of_birth: 0
+            }
+          }
+        },
+        {
           $skip: limit * (page - 1)
         },
         {
