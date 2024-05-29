@@ -44,6 +44,8 @@ class PostsService {
   }
   async getNewFeeds({ user_id }: { user_id: string }) {
     const user_id_obj = new ObjectId(user_id)
+
+    // Lấy danh sách bạn bè của user
     const friends = await databaseService.friends
       .find(
         {
@@ -57,16 +59,32 @@ class PostsService {
         }
       )
       .toArray()
-    const ids = friends.map((item) => item.friend_user_id)
-    ids.push(user_id_obj)
+    const friendIds = friends.map((item) => item.friend_user_id)
 
+    // Kết hợp user_id và friendIds
+    const ids = [...new Set([user_id_obj, ...friendIds])]
+
+    // Lấy thêm các bài viết mà user được tag vào
+    const taggedPosts = await databaseService.posts
+      .find(
+        {
+          mentions: user_id_obj
+        },
+        {
+          projection: {
+            _id: 1
+          }
+        }
+      )
+      .toArray()
+    const taggedPostIds = taggedPosts.map((post) => post._id)
+
+    // Truy vấn các bài viết
     const posts = await databaseService.posts
       .aggregate([
         {
           $match: {
-            user_id: {
-              $in: ids
-            }
+            $or: [{ user_id: { $in: ids } }, { _id: { $in: taggedPostIds } }]
           }
         },
         {
@@ -82,34 +100,6 @@ class PostsService {
             path: '$user'
           }
         },
-        {
-          $lookup: {
-            from: 'friends',
-            localField: 'user_id',
-            foreignField: 'friend_user_id',
-            as: 'friend'
-          }
-        },
-        // {
-        //   $match: {
-        //     $or: [
-        //       {
-        //         visibility: VisibilityType.EveryOne
-        //       },
-        //       {
-        //         $and: [
-        //           {
-        //             visibility: VisibilityType.Friends
-        //           },
-        //           {
-        //             'user.verify': 1
-        //           }
-        //         ]
-        //       }
-        //     ]
-        //   }
-        // },
-        // Đã loại bỏ $skip và $limit
         {
           $lookup: {
             from: 'users',
@@ -168,12 +158,25 @@ class PostsService {
             },
             shares: {
               $size: '$shares'
+            },
+            user_liked: {
+              $cond: {
+                if: {
+                  $in: [user_id_obj, '$likes.user_id']
+                },
+                then: {
+                  //_id: user_id_obj,
+                  liked: true
+                },
+                else: {
+                  liked: false
+                }
+              }
             }
           }
         },
         {
           $project: {
-            friend: 0,
             user: {
               password: 0,
               email_verify_token: 0,
@@ -182,6 +185,7 @@ class PostsService {
               date_of_birth: 0,
               role: 0
             }
+            // likes: 0 // Ẩn chi tiết các like khác, chỉ giữ lại thông tin tổng số like và trạng thái like của người dùng hiện tại
           }
         }
       ])
