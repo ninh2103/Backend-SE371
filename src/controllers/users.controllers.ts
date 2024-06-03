@@ -252,3 +252,10 @@ export const delUserController = async (req: Request, res: Response, next: NextF
     message: USERMESSAGE.DELETE_USER_SUCCESS
   })
 }
+export const getAllUserController = async (req: Request, res: Response, next: NextFunction) => {
+  const users = await usersService.getAllUser()
+  return res.json({
+    message: USERMESSAGE.GET_ALL_USER_SUCCESS,
+    result: users
+  })
+}

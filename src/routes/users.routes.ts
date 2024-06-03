@@ -6,6 +6,7 @@ import {
   deleteFriendRequestController,
   emailVerifyController,
   forgotPasswordController,
+  getAllUserController,
   getMeController,
   getProfileController,
   loginController,
@@ -108,4 +109,5 @@ userRouter.put(
   wrapRequestHandler(changepasswordController)
 )
 userRouter.delete('/delete-user', accessTokenValidator, verifiedUserValidator, wrapRequestHandler(delUserController))
+userRouter.get('/all-user', wrapRequestHandler(getAllUserController))
 export default userRouter

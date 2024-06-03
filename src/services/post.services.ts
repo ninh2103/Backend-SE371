@@ -2,7 +2,6 @@ import { ObjectId, WithId } from 'mongodb'
 import Post from '~/models/schemas/Post.schema'
 import databaseService from './database.services'
 import { PostReqBody } from '~/models/requests/Post.requests'
-import { VisibilityType } from '~/constants/enums'
 
 class PostsService {
   async createPost(user_id: string, body: PostReqBody) {
@@ -172,7 +171,8 @@ class PostsService {
                   liked: false
                 }
               }
-            }
+            },
+            is_friend: true
           }
         },
         {
@@ -190,8 +190,120 @@ class PostsService {
         }
       ])
       .toArray()
+    const unrelatedPosts = await databaseService.posts
+      .aggregate([
+        {
+          $match: {
+            user_id: { $nin: ids },
+            _id: { $nin: taggedPostIds }
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user_id',
+            foreignField: '_id',
+            as: 'user'
+          }
+        },
+        {
+          $unwind: {
+            path: '$user'
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'mentions',
+            foreignField: '_id',
+            as: 'mentions'
+          }
+        },
+        {
+          $addFields: {
+            mentions: {
+              $map: {
+                input: '$mentions',
+                as: 'mention',
+                in: {
+                  _id: '$$mention._id',
+                  name: '$$mention.name',
+                  username: '$$mention.username',
+                  email: '$$mention.email'
+                }
+              }
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'likes',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'likes'
+          }
+        },
+        {
+          $lookup: {
+            from: 'comments',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'comments'
+          }
+        },
+        {
+          $lookup: {
+            from: 'shares',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'shares'
+          }
+        },
+        {
+          $addFields: {
+            likes: {
+              $size: '$likes'
+            },
+            comments: {
+              $size: '$comments'
+            },
+            shares: {
+              $size: '$shares'
+            },
+            user_liked: {
+              $cond: {
+                if: {
+                  $in: [user_id_obj, '$likes.user_id']
+                },
+                then: {
+                  liked: true
+                },
+                else: {
+                  liked: false
+                }
+              }
+            },
+            is_friend: false
+          }
+        },
+        {
+          $project: {
+            user: {
+              password: 0,
+              email_verify_token: 0,
+              forgot_password_token: 0,
+              permisson_id: 0,
+              date_of_birth: 0,
+              role: 0
+            }
+          }
+        }
+      ])
+      .toArray()
 
-    return posts
+    const result = [...posts, ...unrelatedPosts]
+
+    return result
   }
 }
 const postsService = new PostsService()

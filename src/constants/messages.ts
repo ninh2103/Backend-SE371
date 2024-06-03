@@ -65,7 +65,8 @@ export const USERMESSAGE = {
   ROLE_IS_REQUIRED: ' role không được để trống',
   ROLE_IS_INT: 'role phải là kiểu số 0 or 1',
   YOU_NOT_CREATE_GROUP: 'bạn không thể tạo nhóm',
-  YOU_NOT_ADMIN: 'bạn không phải là admin'
+  YOU_NOT_ADMIN: 'bạn không phải là admin',
+  GET_ALL_USER_SUCCESS: 'lấy toàn bộ tài khoản thành công'
 } as const
 
 export const POSTMESSAGE = {
