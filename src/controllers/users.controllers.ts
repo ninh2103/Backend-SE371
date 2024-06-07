@@ -191,6 +191,12 @@ export const acceptFriendRequestController = async (req: Request, res: Response,
   const result = await usersService.acceptFriendReq(user_id, friend_user_id)
   return res.json(result)
 }
+export const checkFriendController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { username } = req.params
+  const result = await usersService.checkFriend(user_id, username)
+  return res.json(result)
+}
 export const deleteFriendRequestController = async (req: Request, res: Response, next: NextFunction) => {
   const { friend_user_id } = req.params
   const { user_id } = req.decoded_authorization as TokenPayload
@@ -253,7 +259,8 @@ export const delUserController = async (req: Request, res: Response, next: NextF
   })
 }
 export const getAllUserController = async (req: Request, res: Response, next: NextFunction) => {
-  const users = await usersService.getAllUser()
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const users = await usersService.getAllUser(user_id)
   return res.json({
     message: USERMESSAGE.GET_ALL_USER_SUCCESS,
     result: users

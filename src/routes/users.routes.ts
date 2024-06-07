@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
   acceptFriendRequestController,
   changepasswordController,
+  checkFriendController,
   delUserController,
   deleteFriendRequestController,
   emailVerifyController,
@@ -88,6 +89,12 @@ userRouter.post(
   acceptValidator,
   wrapRequestHandler(acceptFriendRequestController)
 )
+userRouter.get(
+  '/check-friend/:username',
+  accessTokenValidator,
+  verifiedUserValidator,
+  wrapRequestHandler(checkFriendController)
+)
 userRouter.delete(
   '/delete-friend-requests/:friend_user_id',
   accessTokenValidator,
@@ -109,5 +116,5 @@ userRouter.put(
   wrapRequestHandler(changepasswordController)
 )
 userRouter.delete('/delete-user', accessTokenValidator, verifiedUserValidator, wrapRequestHandler(delUserController))
-userRouter.get('/all-user', wrapRequestHandler(getAllUserController))
+userRouter.get('/all-user', accessTokenValidator, verifiedUserValidator, wrapRequestHandler(getAllUserController))
 export default userRouter

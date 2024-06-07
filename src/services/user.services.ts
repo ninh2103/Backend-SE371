@@ -441,8 +441,27 @@ class UsersService {
       message: USERMESSAGE.CHANGE_PASSWORD_SUCCESS
     }
   }
-  async getAllUser() {
-    const user = await databaseService.users
+  async getAllUser(user_id: string) {
+    const user_id_obj = new ObjectId(user_id)
+
+    const friends = await databaseService.friends
+      .find({
+        $or: [
+          { user_id: user_id_obj, status: 1 },
+          { friend_user_id: user_id_obj, status: 1 }
+        ]
+      })
+      .toArray()
+
+    // Trích xuất các user ID của bạn bè
+    const friendUserIds = new Set(
+      friends.map((friend) => {
+        return friend.user_id.equals(user_id_obj) ? friend.friend_user_id.toString() : friend.user_id.toString()
+      })
+    )
+
+    //Lấy chi tiết tất cả người dùng
+    const users = await databaseService.users
       .find(
         {},
         {
@@ -459,7 +478,39 @@ class UsersService {
         }
       )
       .toArray()
-    return user
+
+    // Thêm cờ isFriend cho mỗi người dùng
+    const usersWithFriendFlag = users.map((user) => ({
+      ...user,
+      isFriend: friendUserIds.has(user._id.toString())
+    }))
+
+    return usersWithFriendFlag
+  }
+  async checkFriend(user_id: string, username: string) {
+    const user_id_obj = new ObjectId(user_id)
+
+    // Tìm người dùng từ username
+    const otherUser = await databaseService.users.findOne({ username: username }, { projection: { _id: 1 } })
+
+    if (!otherUser) {
+      throw new Error('User not found')
+    }
+
+    const otherUser_id_obj = otherUser._id
+    // Kiểm tra trạng thái mối quan hệ giữa user_id và otherUser_id
+    const friendStatus = await databaseService.friends.findOne({
+      status: 1,
+      $or: [
+        { user_id: user_id_obj, friend_user_id: otherUser_id_obj },
+        { user_id: otherUser_id_obj, friend_user_id: user_id_obj }
+      ]
+    })
+
+    return {
+      isFriend: !!friendStatus,
+      friendStatus: friendStatus ? 'friends' : 'not friends'
+    }
   }
 }
 

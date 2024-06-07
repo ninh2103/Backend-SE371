@@ -18,6 +18,7 @@ export enum Tokentype {
   EmailVerifyToken
 }
 export enum StatusFriend {
+  Nothing,
   Pending,
   Accepted
 }
