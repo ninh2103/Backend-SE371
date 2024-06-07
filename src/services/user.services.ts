@@ -498,18 +498,28 @@ class UsersService {
     }
 
     const otherUser_id_obj = otherUser._id
+
     // Kiểm tra trạng thái mối quan hệ giữa user_id và otherUser_id
     const friendStatus = await databaseService.friends.findOne({
-      status: 1,
       $or: [
         { user_id: user_id_obj, friend_user_id: otherUser_id_obj },
         { user_id: otherUser_id_obj, friend_user_id: user_id_obj }
       ]
     })
 
+    let status
+    if (!friendStatus) {
+      status = 0 // Chưa là bạn bè
+    } else if (friendStatus.status === 0) {
+      status = 0 // Chưa là bạn bè
+    } else if (friendStatus.status === 1) {
+      status = 1 // Đã gửi yêu cầu kết bạn
+    } else if (friendStatus.status === 2) {
+      status = 2 // Đã là bạn bè
+    }
+
     return {
-      isFriend: !!friendStatus,
-      friendStatus: friendStatus ? 'friends' : 'not friends'
+      status
     }
   }
 }
